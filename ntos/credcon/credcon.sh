@@ -3,8 +3,7 @@
 export DISPLAY=:0
 
 # Some environmnet variables.
-currentUser=$(whoami)
-rdpFile="/home/${currentUser}/Templates/remote-connection.rdp"
+rdpFile="/home/user/Templates/remote-connection.rdp"
 
 # A YAD loading bar to create the illusion that the system is doing something (which it is).
 # The reason is that a non-technical person might not understand the fact that the system is doing something in the background.
@@ -55,7 +54,6 @@ show_connection_failure() {
 
 # Main loop, because I am a bit used to that programming structure.
 main() {
-    # Start the script by displaying the credential prompt.
     show_credential_dialogue
 
     # Check if the input fields from the credential prompt are populated.
@@ -70,7 +68,7 @@ main() {
 
         # Start xfreerdp session in the background and get its process ID (PID).
         # This does not hinder the process from taking over the (screen/monitor) session.
-        xfreerdp3 "$rdpFile" /u:"${username}" /p:"${password}" /a:drive:/media/user/* &
+        xfreerdp3 "$rdpFile" /u:"${username}" /p:"${password}" /drive:hotplug,* /cert:ignore &
         xfreerdp_pid=$!
 
         # Wait for the xfreerdp process up to $interval seconds, default 30.
@@ -104,7 +102,6 @@ main() {
         # This is done to kill the loading bar process, because it will be followed-up by the "login_failed" dialogue.
         pkill -f yad
 
-        # The follow-up. In the meanwhile the loading bar keeps counting, this is expected because it does not get killed yet...
         show_connection_failure
 
         # Kill the bash process, this stops the background counting of the loading bar. While exiting gracefully!
